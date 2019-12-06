@@ -1,0 +1,518 @@
+---
+title: "Data Summary for Project Magnesium"
+author: "M Wilson"
+date: "23/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(knitr)
+opts_knit$set(root.dir = "C:/Users/mwils/Documents/Work_Academic/PhD/2018-19/Project_Magnesium/Presentation_Graphs_21.11/")
+
+library(tidyverse)
+library(tableone)
+library(knitr)
+```
+
+# Introduction
+
+Serum magnesium concentration is a commonly measured blood test performed on patients admitted to intensive care.  
+
+The normal serum range is 0.6 to 1.0 mmol/L (1.5 - 2.4 mg/dL) as reported from the University College London Hospital Laboratory Service.  
+
+Magnesium is the fourth most abundant cation in the body.  Predominantly concentrated intracellularly it is responsible for enzyme processes, DNA and cell membrane stabilisation and regulation of cardiac and smooth muscle tone.  Specifically at the myocardial level it regulates the activity of the sodium/potassium ATPase pump.  
+
+Previous studies of serum magnesium in intensive care have suggested the majority of patients to be magnesium deficient (<0.6 mmol/L) via multiple aetiologies.  
+
+Magnesium is also frequently supplemented in ICU to maintain normal, or occasionally supra-normal serum concentrations.  This is in response to a range of provoking factors:
+
+  * Prevention of abnormal cardiac rhythms (e.g. Atrial Fibrillation, AF)
+  * Treatment of abnormal cardiac rhythms (e.g. AF or Torsades de Pointes)
+  * Treatment of eclampsia
+  * Treatment of moderate-severe exacerbations of asthma
+  * Treatment of hypokalaemia
+  
+It is a commonly held belief that magnesium supplementation in a critical care setting is efficacious as prophylaxis against developing de novo atrial fibrillation *[REF]*.
+
+This belief stems from a plausible biological mechanism of action, in addition to multiple observational studies.  
+
+In their retrospective analysis of 3530 patients from the Framingham Offspring Study, Khan et al found a moderate association between hypomagnesaemia and subsequent development of atrial fibrillation (adjusted HR 1.52, 1.00 - 2.31, P = 0.05).  
+
+
+
+
+## Aims
+
+1.  Describe the epidemiology of serum magnesium in a general ICU patient cohort
+
+2.  Describe the possible association between AF and serum magnesium
+
+3.  Describe practice preferences for magnesium replacement based on varying serum magnesium concentrations
+
+4.  Derive the causal impact of supplemental magnesium administration on prophylaxis of AF in this population
+
+
+
+# Data Sources
+
+The Philips ICIP database was interrogated for serum magnesium lab measurements, magnesium administration and nurse identifier data.
+
+The CCHIC database was used to extract data pertaining to the following:
+
+* Age at admission
+* Sex
+* Length of stay
+* Admission classification
+* Illness severity by APACHE score
+* CPR in 24 hours prior to admission
+* Unit mortality
+* Heart rhythm
+* Heart rate
+* Serum potassium lab and point of care measurements
+* Serum pH, bicarbonate, arterial carbon dioxide from point of care measurements
+* Serum Creatinine
+
+
+# Data Summary
+
+The final joined data consists of 39,531 observations of 5824 individual patients (as determined by unique patient identity numbers), across 6779 distinct episodes (as defined by unique CCHIC episode identity numbers).  There were 6776 distinct episodes defined using ICIP episode identity numbers.  
+
+The distribution of number of episodes per patient can be seen below.
+
+```{r,results='asis', echo=FALSE}
+# number of observations: 39,531
+
+# number of patients:
+
+num_pts <- 5824
+
+# number of episodes:
+
+num_epi_cchic <- 6779
+num_epi_icip <- 6776
+
+# range of episodes per patient:
+
+epi_pp <- tibble("Number of Episodes" = c(1:9),
+                 "Number of Patients" = c(5102,
+                           572,
+                           103,
+                           27,
+                           10,
+                           7,
+                           1, 1, 1))
+kable(epi_pp, caption = "Number of Episodes Per Patient")
+
+```
+
+
+## Missing Data
+
+The proportion of missing data for each variable in the final data table can be seen below, described per patient.
+
+```{r, results='asis', echo=FALSE}
+# table for missing data per Patient:
+
+missing_data_pt <- 
+  tibble(Variable = c("Age",
+                      "Sex",
+                      "Length of Stay",
+                      "Admission Type",
+                      "APACHE Score",
+                      "CPR in Prev. 24 hours",
+                      "Unit Mortality",
+                      "Potassium at Magnesium Measurement"),
+         Count = c(0, 1, 0, 0, 50, 2,0,1614),
+         Percentage = round(Count/num_pts * 100, 2))
+
+kable(missing_data_pt, caption = "Missing Data Per Episode")
+
+```
+
+## Sample Characteristics
+
+The summary of all the covariates is conducted at the episode level or for individual magnesium windows created.
+
+The sample age range was 18 to 103 years old.  The median age was 64 (52.5 - 75.5).
+
+
+```{r, echo=FALSE}
+knitr::include_graphics("./age_sex_dist.PNG")
+```
+
+
+```{r, results='asis', echo=FALSE}
+# number of male and female patients in dataset
+
+sex <- tibble(
+  sex = c("F", "M", "NA"),
+  count = c(2974, 2849, 1),
+  prop = count/num_pts *100)
+
+kable(sex, caption = "Distribution of Sex")
+```
+
+The median length of stay per episode was 2.3 days (0.3 - 4.3).  
+
+```{r, results='asis', echo=FALSE}
+
+# Length of Stay:
+
+# median across all episodes: 2.3 days
+# IQR across all episodes: 4 days
+
+los_sex <- tibble(
+  sex = c("F", "M"),
+  median_los = c(2.15, 2.50),
+  iqr_los = c(3.59, 4.88)
+)
+
+kable(los_sex, caption = "Length of Stay (Days) by Sex")
+```
+
+
+Admissions were classified as planned medical or surgical and 'other'.  'Other' is a composite of unplanned local admissions or transfers, planned transfers and repatriations.  
+
+There were 87 episodes labelled as planned medical admissions, 2506 planned surgical episodes and 4186 episodes of admission type 'Other'. 
+
+```{r,results='asis', echo=FALSE}
+# Admission type:
+  # L = unplanned local admission
+  # U = unplanned transfer in 
+  # P = planned transfer in
+  # S = planned local surgical admission
+  # M = planned local medical admission
+  # R = repatriation
+
+adm_type_row <- tibble(
+  type = c("Medical", "Surgical", "Other"),
+  count = c(272, 8625, 30634),
+  prop = count/39531 * 100)
+
+# now done grouped by episode:
+
+adm_type_episode <- 
+  tibble(
+    type = c("Medical", "Surgical", "Other"),
+    count = c(87, 2506, 4186),
+    prop = count/num_epi_cchic * 100)
+
+kable(adm_type_episode, caption = "Categorised Admission Type")
+
+```
+
+
+Severity of illness was estimated by admission APACHE score.  This was absent for 50 patients.  The median APACHE score per episode was 16 (12 - 20).  This was the same for males and females.  
+
+In addition, whether the patient underwent CPR in the 24 hours preceding admission was also recorded.  Two patients were missing CPR data.    
+
+
+```{r, results='asis', echo=FALSE}
+sex <- c("Male", "Female")
+cpr <- c("Yes", "No", "Missing")
+count <- c(78, 3342, 1)
+
+
+cpr <- matrix(c(78, 3342, 1, 107, 3249, 1), ncol = 3, byrow = T)
+colnames(cpr) <- c("CPR", "No CPR", "Missing")
+rownames(cpr) <- c("Female", "Male")
+
+cpr <- as.table(cpr)
+
+kable(cpr, caption = "CPR in 24 hours prior to admission")
+
+# nb equates to 6778 episodes because of the 1 episode with NA for sex
+```
+
+Unit mortality 9.34% across all selected episodes.  The mean serum magnesium on admission for surviving patients was 0.79 mmol/L, versus 0.87 mmol/L for those who died.
+
+
+## Magnesium 
+
+The distribution of serum magnesium measurements on first arrival to ICU is described below.  The admission serum magnesium is defined as the first recorded magnesium lab measurement associated with the episode following the final joining process.  
+
+For reference the join was defined such that magnesium measurements associated with the episode ID were joined to that episode, occurring up to 12 hours prior to the episode start time identified in the CCHIC data.  This was to allow initial magnesium measurements occurring prior to admission but still influencing decisions taken during the admission to be captured.  For reference, 98% of episodes had their first serum magnesium measurement recorded within 24 hours of the episode start.  
+
+The mean serum magnesium on admission per episode was 0.80 mmol/L (sd, 0.21).  There was minimal difference between men and women (female mean 0.79, male 0.81) and serum magnesium on admission stayed relatively consistent across age range and APACHE score.
+
+```{r, echo=FALSE}
+knitr::include_graphics("./admission_mg_age_smooth.PNG")
+```
+
+
+```{r, echo=FALSE}
+knitr::include_graphics("./admission_mg_sex_dist.PNG")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("./admission_mg_apache.PNG")
+```
+
+
+The mean serum magnesium value across the duration of the episode was 0.86 mmol/L (sd, 0.15).  
+
+The mean change in serum magnesium value across each episode was -0.12 mmol/L (sd, 0.27).
+
+When stratified by unit mortality, patients who survived had an average serum magnesium of 0.79 mmol/L versus 0.87 in those who died.  
+
+```{r, echo=FALSE}
+knitr::include_graphics("./admission_mg_mortality.PNG")
+```
+
+
+The median number of serum magnesium measurements per episode was 3 (1 - 5).  
+
+```{r, echo=FALSE}
+knitr::include_graphics("./num_mg_lab_episode.PNG")
+```
+
+The timing of recorded serum magnesium measurements was predominantly concentrated in the morning.
+
+```{r, echo=FALSE}
+knitr::include_graphics("./mg_labtime_dist.PNG")
+```
+
+
+The median number of administrations per episode was 1 (0 - 2), with a range of 0-78 administrations per episode.
+
+
+```{r, echo=FALSE}
+knitr::include_graphics("./mg_admin_freq_epi.PNG")
+```
+
+The timing of magnesium administrations was predominantly concentrated around mid-morning.
+
+```{r, echo=FALSE}
+knitr::include_graphics("./mg_admintime_dist.PNG")
+```
+
+
+Stratifying serum magnesium measurements by subsequent magnesium administration confirms that magnesium supplementation more commonly occurs predominantly at levels < 1.0 mmol/L.   
+
+```{r, echo=FALSE}
+knitr::include_graphics("./mg_dist_admin.PNG")
+```
+
+## Potassium
+
+Potassium closest to the serum magnesium lab measurement was extracted from potassium lab measurements.  Where two measurements existed equally distant from the magnesium measurement, the mean was taken.  
+
+There were missing potassium values for 1614 episodes (27%) and 2258 magnesium windows (5.71%).  
+
+The mean potassium for each episode was 4.46 mmol/L (sd, 0.42).  
+
+The mean potassium for each magnesium window was 4.55 mmol/L (sd, 0.36).  The mean potassium for each magnesium window where magnesium was subsequently administered vs. where it was not administered was similar at 4.52 (sd, 0.33) vs. 4.57 (sd, 0.38).  
+
+
+
+## Atrial Fibrillation
+
+There were 641 episodes which started in AF.  AF events were defined as rhythm changes from sinus rhythm or "other" to AF within the magnesium window.  510 episodes contained at least one AF event.  1388 magnesium windows contained at least one AF event.  
+
+The mean serum magnesium at the start of the magnesium window for windows with no AF events was 0.92 mmol/L.
+
+The mean serum magnesium at the start of the magnesium window for windows containing an AF event was 1.01 mmol/L.
+
+```{r, echo=FALSE}
+knitr::include_graphics("./serum_mg_af_event.PNG")
+```
+
+
+
+
+# Table 1
+
+
+
+
+
+## Summary of Variables Per Episode
+
+
+
+```{r, results='asis', echo=FALSE}
+
+# per episode
+
+table1 <- tibble(
+  Variable = c("Median (IQR) Age (Years)",
+              "Sex",
+              "Median (IQR) Length of Stay (Days)",
+              "Admission Type",
+              "Median (IQR) APACHE Score",
+              "CPR in Prev. 24 hours (%)",
+              "Unit Mortality (%)",
+              "Mean (sd) Serum Potassium (mmol/L)",
+              "Median (IQR) Serum Magnesium Measurements",
+              "Mean (sd) Serum Magnesium on admission (mmol/L)",
+              "Mean (sd) Serum Magnesium across admission (mmol/L)",
+              "Mean (sd) Trend in Serum Magnesium across admission (mmol/L)",
+              "Median (IQR) Magnesium Administrations"),
+  
+  Summary = c("64 +/- 23",
+             "Female: 51.1",
+             "2.3 +/- 4",
+             "Medical: 87 (1.28%), Surgical: 2506 (37%), Other: 4186 (61.7%)",
+             "16 +/- 8",
+             "2.81",
+             "9.34",
+             "4.46 (0.36)",
+             "3 (4)",
+             "0.80 (0.21)",
+             "0.86 (0.15)",
+             "-0.12 (0.27)",
+             "1 (2)"
+             ))
+                                
+
+
+kable(table1, caption = "Summary of Characteristics Per Patient Episode")
+```
+
+
+
+
+
+
+## Summary of Variables Per Magnesium Window
+
+
+
+
+```{r, results='asis', echo=F}
+
+# here the unit of summary is each mg window, n = 39,531)
+
+table2 <- tibble(
+  Variable = c("Number receiving Magnesium Administration (%)",
+               "Median (IQR) time to Magnesium Administration (hours)",
+               "Range of number of Magnesium Administrations",
+               "Mean (sd) Serum Magnesium (mmol/L)",
+               "Number starting in Atrial Fibrillation (%)",
+               "Number containing an Atrial Fibrillation Event (%)",
+               "Number of Potential Treatment Events (% of total Magnesium Administrations)",
+               "Median (IQR) length of Magnesium Window (hours)",
+               "Median (IQR) time to Atrial Fibrillation Event (hours)",
+               "Median (IQR) time to Magnesium Administration (hours)"),
+  # looks like the majority of windows are censored for 24 hours.
+  # AF event defined as change from SR-> AF within mg window.
+  # treatment event defined as mg_admin occurring after first af
+
+  Summary = c("15,065 (38.1)",
+              "6 (6)",
+              "0 - 15 (1.49% with > 1 Magnesium Administration)",
+              "0.93 (0.22)",
+              "2836 (7.2)",
+              "1388 (3.5)",
+              "385 (2.6)",
+              "23 (11.5)",
+              "6 (9.3)",
+              "6 (6)"))
+
+kable(table2, caption = "Summary of Characteristics Per Magnesium Window")
+              
+
+```
+
+
+
+# Analysis
+
+
+## Logistic Regression
+
+
+Simple logistic regression model:
+
+```{r, echo = FALSE}
+
+#reg <- 
+  #glm(af_event ~ serum_mg, data = tbl2, family = "binomial")
+
+#summary(reg)
+
+#exp(1.53) # 4.62 (odds) per 1 unit mg (i.e. 0.46 increased odds for every 0.1 mmol/L increase in serum mg)
+```
+
+This suggests that a one unit increase in serum magnesium is associated with a 1.53 increase in log odds of having an AF event (p < 0.001), or a 0.46 increased odds of developing AF for every 0.1 mmol/L increase in serum magnesium.
+
+```{r, echo=FALSE}
+knitr::include_graphics("./mg_af_glm_smooth.PNG")
+```
+
+After the addition of age, sex, APACHE score and potassium to the model:
+
+
+```{r, echo=FALSE}
+knitr::include_graphics("./log_reg_result.PNG")
+```
+
+
+## Time to Event Analysis
+
+Censor variables were created, starting from the magnesium lab date for each window.  All windows were censored if they reached the end of the window, defined as the minimum of the next magnesium lab measurement, the end of the episode or 24 hours.  Windows were censored if magnesium was administered or the outcome occurred (AF event).
+
+The total follow up time for each variable was create by taking the minimum of all the different censor variables.  
+
+Serum magnesium was initially categorised into low vs. high (serum mg < 0.8, low).  
+
+```{r, echo=FALSE}
+knitr::include_graphics("./tte_analysis.PNG")
+```
+
+Serum magnesium was also categorised into five boundaries:
+
+  1. Less than 0.5
+  2. 0.5 - 0.8
+  3. 0.8 - 1.0
+  4. 1.0 - 1.2
+  5. Greater than 1.2
+  
+
+  
+```{r, echo=FALSE}
+knitr::include_graphics("./tte_analysis_mg_cat.PNG")
+```
+
+
+
+
+
+
+
+# Discussion
+
+
+
+Provisional set of analysis for 39,531 magnesium windows has suggested a possible association betweeen higher magnesium levels and onset of atrial fibrillation within the magnesium window.  This association is demonstrated across both basic logistic regression and a time to event analyses.  Once adjusted for age, sex, illness severity and potassium level a significant association persists.
+
+
+
+
+
+
+# Next Steps
+
+
+
+- Add additional covariates:
+  - Serum creatinine at magnesium lab measurement (as indicator of CRF)
+  - Potassium at time of mg administration & time of af event
+  - Indicators of previous atrial fibrillation
+  - Serum pH, bicarbonate, PaCO2 (as indicator of biochemical state)
+
+- Evaluate pipeline integrity:
+  - via lab meeting
+  - create synthetic test data set
+
+- Explore potential explanation for findings:
+  - Cox PH model with additional covariates
+  - Multilevel logistic regression to account for episode/pt differences
+  
+- Use step in serum magnesium administration to create regression discontinuity analysis
+
+- Create stricter magnesium windows with attached nursing data and evaluate behaviour around magnesium administration as first step of IV analysis.
+
+
+
