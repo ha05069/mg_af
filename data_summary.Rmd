@@ -130,8 +130,8 @@ missing_data_pt <-
                       "CPR in Prev. 24 hours",
                       "Unit Mortality",
                       "Potassium at Magnesium Measurement"),
-         Count = c(0, 1, 0, 0, 37, 2,0,1614),
-         Percentage = round(Count/num_pts * 100, 2))
+         Count = c(0, 1, 0, 0, 37, 2,0,1423),
+         Percentage = round(Count/num_epi_cchic * 100, 2))
 
 kable(missing_data_pt, caption = "Missing Data Per Episode")
 
@@ -331,11 +331,17 @@ knitr::include_graphics("./mg_dist_admin.PNG")
 
 Potassium closest to the serum magnesium lab measurement was extracted from potassium lab measurements.  Where two measurements existed equally distant from the magnesium measurement, the mean was taken.  
 
-There were missing potassium values for 1614 episodes (27%) and 2258 magnesium windows (5.71%).  
+There were missing potassium values for 1423 episodes (21%) and 1652 magnesium windows (4.3%).  
 
-The mean potassium for each episode was 4.46 mmol/L (sd, 0.42).  
+The mean potassium for each episode was 4.46 mmol/L (sd, 0.43).  
 
-The mean potassium for each magnesium window was 4.55 mmol/L (sd, 0.36).  The mean potassium for each magnesium window where magnesium was subsequently administered vs. where it was not administered was similar at 4.52 (sd, 0.33) vs. 4.57 (sd, 0.38).  
+The mean potassium for each magnesium window was 4.55 mmol/L (sd, 0.55).  The mean potassium for each magnesium window where magnesium was subsequently administered vs. where it was not administered was similar at 4.48 (sd, 0.51) vs. 4.60 (sd, 0.56).  
+
+The mean potassium for each magnesium window where AF subsequently occurred was 4.55 (sd, 0.55) vs. 4.71 (sd, 0.52) where there was no AF. 
+
+The mean potassium closest to the first AF episode in a window (up to three hours preceding event) was... *waiting for updated windowing*
+
+The mean potassium at the time of magnesium administration (up to three hours preceding event) was... *waiting for updated windowing*
 
 
 
@@ -390,7 +396,7 @@ table1 <- tibble(
              "16 +/- 8",
              "2.81",
              "9.34",
-             "4.46 (0.36)",
+             "4.46 (0.43)",
              "3 (4)",
              "0.80 (0.21)",
              "0.89 (0.15)",
@@ -422,6 +428,7 @@ table2 <- tibble(
                "Median (IQR) time to Magnesium Administration (hours)",
                "Range of number of Magnesium Administrations",
                "Mean (sd) Serum Magnesium (mmol/L)",
+               "Mean (sd) Serum Potassium (mmol/L)",
                "Number starting in Atrial Fibrillation (%)",
                "Number containing an Atrial Fibrillation Event (%)",
                "Number of Potential Treatment Events (% of total Magnesium Administrations)",
@@ -434,6 +441,7 @@ table2 <- tibble(
               "6.42 (5.83)",
               "0 - 15 (1.59% with > 1 Magnesium Administration)",
               "0.93 (0.22)",
+              "4.55 (0.55)",
               "2854 (7.5)",
               "1173 (3.1)",
               "353 (2.4 of all Mg administrations)",
@@ -507,6 +515,22 @@ Serum magnesium was also categorised into five boundaries:
 ```{r, echo=FALSE}
 knitr::include_graphics("./tte_analysis_mg_cat.PNG")
 ```
+
+
+## Instrumental Variable Analysis
+
+### Description of Nurse Data
+
+To facilitate investigation of a causal relationship between clinician and administration of magnesium, a stricter time window was created.
+
+The original data set was filtered for magnesium lab values occurring between midnight and 10 am.  
+
+This produced a table of 28,681 magnesium windows.  When this was filtered for clinician identifiers being present this reduced to 13,050 magnesium windows.
+
+There were 715 individual clinicians identified within this filtered dataset.  The number of magnesium windows associated with each clinician ID ranged between 1 and 237 (median 3, IQR 1 - 26).
+
+44% of these magnesium windows received a magnesium administration.  3.34% went on to develop AF within the magnesium window.
+
 
 
 
