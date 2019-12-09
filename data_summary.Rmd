@@ -76,31 +76,33 @@ The CCHIC database was used to extract data pertaining to the following:
 
 # Data Summary
 
-The final joined data consists of 39,531 observations of 5824 individual patients (as determined by unique patient identity numbers), across 6779 distinct episodes (as defined by unique CCHIC episode identity numbers).  There were 6776 distinct episodes defined using ICIP episode identity numbers.  
+The final joined data consists of 38,521 observations of 5824 individual patients (as determined by unique patient identity numbers), across 6779 distinct episodes (as defined by unique CCHIC episode identity numbers).  There were 6776 distinct episodes defined using ICIP episode identity numbers.  
 
 The distribution of number of episodes per patient can be seen below.
 
 ```{r,results='asis', echo=FALSE}
-# number of observations: 39,531
+# Summary from "tbl_3.RData" file from cleaned pipeline
+
+# number of observations: 38,521
 
 # number of patients:
 
-num_pts <- 5824
+num_pts <- 5784
 
 # number of episodes:
 
-num_epi_cchic <- 6779
-num_epi_icip <- 6776
+num_epi_cchic <- 6735
+num_epi_icip <- 6728
 
 # range of episodes per patient:
 
 epi_pp <- tibble("Number of Episodes" = c(1:9),
-                 "Number of Patients" = c(5102,
-                           572,
-                           103,
-                           27,
-                           10,
-                           7,
+                 "Number of Patients" = c(5064,
+                           569,
+                           106,
+                           25,
+                           11,
+                           6,
                            1, 1, 1))
 kable(epi_pp, caption = "Number of Episodes Per Patient")
 
@@ -513,6 +515,8 @@ Provisional set of analysis for 39,531 magnesium windows has suggested a possibl
 - Use step in serum magnesium administration to create regression discontinuity analysis
 
 - Create stricter magnesium windows with attached nursing data and evaluate behaviour around magnesium administration as first step of IV analysis.
+
+
 
 
 
