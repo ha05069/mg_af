@@ -446,6 +446,8 @@ kable(table2, caption = "Summary of Characteristics Per Magnesium Window")
 
 
 
+
+
 # Analysis
 
 
@@ -456,26 +458,28 @@ Simple logistic regression model:
 
 ```{r, echo = FALSE}
 
-#reg <- 
-  #glm(af_event ~ serum_mg, data = tbl2, family = "binomial")
+# reg <- 
+ # glm(af_event ~ serum_mg, data = tbl2, family = "binomial")
 
 #summary(reg)
 
-#exp(1.53) # 4.62 (odds) per 1 unit mg (i.e. 0.46 increased odds for every 0.1 mmol/L increase in serum mg)
+#exp(1.4763) # 4.377 (odds) per 1 unit mg (i.e. 0.44 increased odds for every 0.1 mmol/L increase in serum mg)
 ```
 
-This suggests that a one unit increase in serum magnesium is associated with a 1.53 increase in log odds of having an AF event (p < 0.001), or a 0.46 increased odds of developing AF for every 0.1 mmol/L increase in serum magnesium.
+This suggests that a one unit increase in serum magnesium is associated with a 1.48 increase in log odds of having an AF event (p < 0.001), or a 0.44 increased odds of developing AF for every 0.1 mmol/L increase in serum magnesium.
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./mg_af_glm_smooth.PNG")
+knitr::include_graphics("./Images/mg_af_glm_smooth.PNG")
 ```
 
-After the addition of age, sex, APACHE score and potassium to the model:
+After the addition of age, sex, APACHE score, potassium and creatinine at the time of mg measurement to the model:
 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./log_reg_result.PNG")
+knitr::include_graphics("./Images/log_reg_result.PNG")
 ```
+
+
 
 
 ## Time to Event Analysis
@@ -542,7 +546,6 @@ Provisional set of analysis for 39,531 magnesium windows has suggested a possibl
 - Use step in serum magnesium administration to create regression discontinuity analysis
 
 - Create stricter magnesium windows with attached nursing data and evaluate behaviour around magnesium administration as first step of IV analysis.
-
 
 
 
