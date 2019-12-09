@@ -490,16 +490,42 @@ knitr::include_graphics("./Images/log_reg_result.PNG")
 
 
 
+
 ## Time to Event Analysis
 
 Censor variables were created, starting from the magnesium lab date for each window.  All windows were censored if they reached the end of the window, defined as the minimum of the next magnesium lab measurement, the end of the episode or 24 hours.  Windows were censored if magnesium was administered or the outcome occurred (AF event).
 
 The total follow up time for each variable was create by taking the minimum of all the different censor variables.  
 
-Serum magnesium was initially categorised into low vs. high (serum mg < 0.8, low).  
+A summary of the times to events are listed below.
+
+```{r}
+table3 <- tibble(
+  Variable = c("Median (IQR) from mg lab measurement to first mg administration (hours)",
+               "Median (IQR) time to first AF event (hours)"),
+  # looks like the majority of windows are censored for 24 hours.
+  # AF event defined as change from SR-> AF within mg window.
+  # treatment event defined as mg_admin occurring after first af
+
+  Summary = c("6.42 (5.83)",
+              "8 (10.633)"))
+
+kable(table3, caption = "Times to events")
+```
+
+
+Serum magnesium was initially categorised into low vs. high (serum mg < 1, low).  
+
+```{r}
+# surv_object <- Surv(time = tbl2$fu_time, event = tbl2$event)
+# fit1 <- survfit(surv_object ~ mg_binary, data = tbl2)
+# summary(fit1)
+```
+
+The results of the survival analysis are displayed below.
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./tte_analysis.PNG")
+knitr::include_graphics("./Images/tte_analysis.PNG")
 ```
 
 Serum magnesium was also categorised into five boundaries:
@@ -515,6 +541,7 @@ Serum magnesium was also categorised into five boundaries:
 ```{r, echo=FALSE}
 knitr::include_graphics("./tte_analysis_mg_cat.PNG")
 ```
+
 
 
 ## Instrumental Variable Analysis
