@@ -543,6 +543,8 @@ knitr::include_graphics("./tte_analysis_mg_cat.PNG")
 ```
 
 
+A Cox proportional hazard regression was performed with AF as the outcome variable and serum magenesium, age, sex, apache score, potassium and creatinine as covariates. The results are displayed below. 
+
 
 ## Instrumental Variable Analysis
 
