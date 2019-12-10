@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 require(knitr)
-opts_knit$set(root.dir = "C:/Users/mwils/Documents/Work_Academic/PhD/2018-19/Project_Magnesium/Presentation_Graphs_21.11/")
+opts_knit$set(root.dir = "C:/Users/mwils/Documents/Work_Academic/PhD/2018-19/Project_Magnesium/Manuscripts/")
 
 library(tidyverse)
 library(tableone)
@@ -74,11 +74,20 @@ The CCHIC database was used to extract data pertaining to the following:
 * Serum Creatinine
 
 
+# Pipeline
+
+```{r, echo=FALSE}
+knitr::include_graphics("./images/pipeline.png")
+```
+
+
 # Data Summary
 
 ## Exclusion Criteria
 
-1.  Age < 18
+Patients < 18 years old on admission were excluded.  
+
+Additional exclusion criteria were applied specific to each analysis as detailed below.
 
 
 The final joined data consists of 38,222 observations of 5739 individual patients (as determined by unique patient identity numbers), across 6675 distinct episodes (as defined by unique CCHIC episode identity numbers).  There were 6776 distinct episodes defined using ICIP episode identity numbers.  
@@ -147,7 +156,7 @@ The sample age range was 18 to 103 years old.  The median age was 64 (52.5 - 75.
 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./age_sex_dist.PNG")
+knitr::include_graphics("./images/dist_age_sex.png")
 ```
 
 
@@ -270,16 +279,16 @@ For reference the join was defined such that magnesium measurements associated w
 The mean serum magnesium on admission per episode was 0.80 mmol/L (sd, 0.21).  There was minimal difference between men and women (female mean 0.79, male 0.81) and serum magnesium on admission stayed relatively consistent across age range and APACHE score.
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./admission_mg_age_smooth.PNG")
+knitr::include_graphics("./images/mg_age_smooth.png")
 ```
 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./admission_mg_sex_dist.PNG")
+knitr::include_graphics("./images/mg_sex_box.png")
 ```
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./admission_mg_apache.PNG")
+knitr::include_graphics("./images/mg_apache_smooth.png")
 ```
 
 
@@ -290,20 +299,20 @@ The mean change in serum magnesium value across each episode was -0.11 mmol/L (s
 When stratified by unit mortality, patients who survived had an average serum magnesium of 0.79 mmol/L versus 0.87 in those who died.  
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./admission_mg_mortality.PNG")
+knitr::include_graphics("./images/mg_mortality.png")
 ```
 
 
 The median number of serum magnesium measurements per episode was 3 (1 - 5).  
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./num_mg_lab_episode.PNG")
+knitr::include_graphics("./images/freq_mg_lab.png")
 ```
 
 The timing of recorded serum magnesium measurements was predominantly concentrated in the morning.
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./mg_labtime_dist.PNG")
+knitr::include_graphics("./images/lab_timings.png")
 ```
 
 
@@ -311,20 +320,20 @@ The median number of administrations per episode was 1 (0 - 2), with a range of 
 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./mg_admin_freq_epi.PNG")
+knitr::include_graphics("./images/admin_timings.png")
 ```
 
 The timing of magnesium administrations was predominantly concentrated around mid-morning.
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./mg_admintime_dist.PNG")
+knitr::include_graphics("./images/admin_timings_dist.png")
 ```
 
 
 Stratifying serum magnesium measurements by subsequent magnesium administration confirms that magnesium supplementation more commonly occurs predominantly at levels < 1.0 mmol/L.   
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./mg_dist_admin.PNG")
+knitr::include_graphics("./images/mg_lab_admin_dist.png")
 ```
 
 ## Potassium
@@ -354,7 +363,7 @@ The mean serum magnesium at the start of the magnesium window for windows with n
 The mean serum magnesium at the start of the magnesium window for windows containing an AF event was 1.01 mmol/L.
 
 ```{r, echo=FALSE}
-knitr::include_graphics("./serum_mg_af_event.PNG")
+knitr::include_graphics("./images/mg_lab_af_dist.png")
 ```
 
 
@@ -416,7 +425,7 @@ kable(table1, caption = "Summary of Characteristics Per Patient Episode")
 
 ## Summary of Variables Per Magnesium Window
 
-
+This is a summary of each magnesium window after applying exclusion criteria of age < 18 years old.
 
 
 ```{r, results='asis', echo=F}
@@ -539,7 +548,7 @@ Serum magnesium was also categorised into five boundaries:
 
   
 ```{r, echo=FALSE}
-knitr::include_graphics("./tte_analysis_mg_cat.PNG")
+knitr::include_graphics("./images/tte_analysis.PNG")
 ```
 
 
