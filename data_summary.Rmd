@@ -552,6 +552,11 @@ knitr::include_graphics("./images/tte_analysis.PNG")
 ```
 
 
+A Cox proportional hazards regression was carried out. 
+
+```{r, echo=FALSE}
+knitr::include_graphics("./Images/cox_results.png")
+```
 
 ## Instrumental Variable Analysis
 
