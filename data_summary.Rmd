@@ -138,8 +138,10 @@ missing_data_pt <-
                       "APACHE Score",
                       "CPR in Prev. 24 hours",
                       "Unit Mortality",
-                      "Potassium at Magnesium Measurement"),
-         Count = c(0, 1, 0, 0, 37, 2,0,1423),
+                      "Potassium at Magnesium Measurement",
+                      "Creatinine at Magnesium Measurement",
+                      "pH at Magnesium Measurement"),
+         Count = c(0, 1, 0, 0, 37, 2,0,1423,1235,2531),
          Percentage = round(Count/num_epi_cchic * 100, 2))
 
 kable(missing_data_pt, caption = "Missing Data Per Episode")
@@ -348,9 +350,27 @@ The mean potassium for each magnesium window was 4.55 mmol/L (sd, 0.55).  The me
 
 The mean potassium for each magnesium window where AF subsequently occurred was 4.55 (sd, 0.55) vs. 4.71 (sd, 0.52) where there was no AF. 
 
-The mean potassium closest to the first AF episode in a window (up to three hours preceding event) was... *waiting for updated windowing*
+The mean potassium closest to the first AF episode in a window (up to three hours preceding event) was 4.35 (sd, 0.52).
 
-The mean potassium at the time of magnesium administration (up to three hours preceding event) was... *waiting for updated windowing*
+The mean potassium at the time of magnesium administration (up to three hours preceding event) was 4.14 (sd, 0.51). 
+
+
+## Creatinine
+
+Creatinine closest to each serum magnesium lab measurement was extracted.  
+
+There were missing creatinine values for 1235 episodes (18.2%) and 2428 magnesium windows (6.4%).
+
+The mean creatinine across all the magnesium windows was 105 mmol/L.  
+
+
+## pH
+
+Venous or arterial pH closest to each magnesium lab measurement was extracted.
+
+There were missing pH values for 2531 episodes (37%) and 3873 magnesium windows (10.1%).
+
+The mean pH across all the magnesium windows was 7.38 (sd, 0.07).
 
 
 
