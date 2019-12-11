@@ -8,8 +8,6 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 require(knitr)
-opts_knit$set(root.dir = "C:/Users/mwils/Documents/Work_Academic/PhD/2018-19/Project_Magnesium/Manuscripts/")
-
 library(tidyverse)
 library(tableone)
 library(knitr)
@@ -585,24 +583,23 @@ knitr::include_graphics("./Images/cox_results.png")
 
 To facilitate investigation of a causal relationship between clinician and administration of magnesium, a stricter time window was created.
 
+A dataset with more restricted time windows was created for the IV analysis. It consists of 9620 time windows with 164 instances of AF.
 
-After applying filtering conditions as displayed, we used a dataset of 10,298 windows, with 180 instances of AF. 
+Summary information about the data is displayed below.
 
-There were 669 unique day nurses in this dataset.
+```{r, echo = FALSE}
+table4 <- data.frame(
+  no_AF = c(5715, 3741),
+  AF = c(126, 38))
+rownames(table4) <- c("no Mg given", "Mg given")
 
+kable(table4)
+```
 
-<!-- The original data set was filtered for magnesium lab values occurring between midnight and 10 am.   -->
+There were 643 unique day nurses in this dataset.
+55 windows where no mg was given until after the first AF. These were treated as instances of AF with no magnesium administered.
 
-<!-- This produced a table of 28,681 magnesium windows.  When this was filtered for clinician identifiers being present this reduced to 13,050 magnesium windows. -->
-
-<!-- There were 715 individual clinicians identified within this filtered dataset.  The number of magnesium windows associated with each clinician ID ranged between 1 and 237 (median 3, IQR 1 - 26). -->
-
-<!-- 44% of these magnesium windows received a magnesium administration.  3.34% went on to develop AF within the magnesium window. -->
-
-
-
-
-
+The number of windows per nurse ranged from 1 to 117 with a median of 4(1-24). 
 
 
 
@@ -611,8 +608,6 @@ There were 669 unique day nurses in this dataset.
 
 
 Provisional set of analysis for 39,531 magnesium windows has suggested a possible association betweeen higher magnesium levels and onset of atrial fibrillation within the magnesium window.  This association is demonstrated across both basic logistic regression and a time to event analyses.  Once adjusted for age, sex, illness severity and potassium level a significant association persists.
-
-
 
 
 
