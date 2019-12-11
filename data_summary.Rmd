@@ -17,6 +17,8 @@ library(knitr)
 
 # Introduction
 
+
+
 Serum magnesium concentration is a commonly measured blood test performed on patients admitted to intensive care.  
 
 The normal serum range is 0.6 to 1.0 mmol/L (1.5 - 2.4 mg/dL) as reported from the University College London Hospital Laboratory Service.  
@@ -39,7 +41,10 @@ This belief stems from a plausible biological mechanism of action, in addition t
 
 ## Existing Literature
 
+
+
 **Meta-Analyses**
+
 
 1.  Intravenous magnesium prevents atrial fibrillation after coronary artery bypass grafting: a meta-analysis of 7 double-blind, placebo-controlled, randomised trials, 2012.
 
@@ -47,6 +52,7 @@ Pooled analysis showed significantly reduced postoperative AF (RR 0.64) with mag
 
 
 **Systematic Reviews**
+
 
 1.  Interventions for preventing postoperative atrial fibrillation in patients undergoing heart surgery, Cochrane Review, 2013.
 
@@ -57,10 +63,12 @@ Pooled analysis showed significantly reduced postop AF in treatment group (16.5%
 
 **Randomised Controlled Trials**
 
+
 1.  Effects of intravenous magnesium sulphate in suspected acute myocardial infarction on acute arrhythmias and long term outcome, 1995. 
 
 
 **Literature Reviews**
+
 
 1.  New-onset atrial fibrillation in adult patients after cardiac surgery, 2019.
 
@@ -84,6 +92,7 @@ In cardiac surgery two periods of increased risk have been identified, immediate
 
 **Observational**
 
+
 1.  Low serum magnesium and the development of atrial fibrillation in the community: The Framingham Heart Study, 2013.
 
 In their retrospective analysis of 3530 patients from the Framingham Offspring Study, Khan et al found a moderate association between hypomagnesaemia and subsequent development of atrial fibrillation (adjusted HR 1.52, 1.00 - 2.31, P = 0.05).
@@ -104,7 +113,11 @@ In this observational cohort study, Howitt et al reviewed heart rhythm data for 
 
 
 
-```{r}
+
+
+
+
+```{r, echo=FALSE}
 lit <-
   tibble(
   Study = c("Khan et al",
@@ -172,7 +185,7 @@ lit <-
   
 )
 
-kable(lit)
+kable(lit, caption = "Summary of Existing Literature")
 ```
 
 
@@ -181,6 +194,8 @@ kable(lit)
 
 
 ## Aims
+
+
 
 1.  Describe the epidemiology of serum magnesium in a general ICU patient cohort
 
@@ -193,6 +208,8 @@ kable(lit)
 
 
 # Data Sources
+
+
 
 The Philips ICIP database was interrogated for serum magnesium lab measurements, magnesium administration and nurse identifier data.
 
@@ -214,6 +231,8 @@ The CCHIC database was used to extract data pertaining to the following:
 
 # Pipeline
 
+
+
 ```{r, echo=FALSE}
 knitr::include_graphics("./images/pipeline.png")
 ```
@@ -221,7 +240,11 @@ knitr::include_graphics("./images/pipeline.png")
 
 # Data Summary
 
+
+
 ## Exclusion Criteria
+
+
 
 Patients < 18 years old on admission were excluded.  
 
@@ -231,6 +254,8 @@ Additional exclusion criteria were applied specific to each analysis as detailed
 The final joined data consists of 38,222 observations of 5739 individual patients (as determined by unique patient identity numbers), across 6675 distinct episodes (as defined by unique CCHIC episode identity numbers).  There were 6776 distinct episodes defined using ICIP episode identity numbers.  
 
 The distribution of number of episodes per patient can be seen below.
+
+
 
 ```{r,results='asis', echo=FALSE}
 # Summary from "tbl_3.RData" file from cleaned pipeline
@@ -261,9 +286,15 @@ kable(epi_pp, caption = "Number of Episodes Per Patient")
 ```
 
 
+
+
 ## Missing Data
 
+
+
 The proportion of missing data for each variable in the final data table can be seen below, described per patient.
+
+
 
 ```{r, results='asis', echo=FALSE}
 # table for missing data per Episode:
@@ -288,7 +319,11 @@ kable(missing_data_pt, caption = "Missing Data Per Episode")
 
 ## Sample Characteristics
 
+
+
 The summary of all the covariates is conducted at the episode level or for individual magnesium windows created.
+
+
 
 ### Age
 
