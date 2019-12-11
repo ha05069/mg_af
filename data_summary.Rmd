@@ -585,13 +585,19 @@ knitr::include_graphics("./Images/cox_results.png")
 
 To facilitate investigation of a causal relationship between clinician and administration of magnesium, a stricter time window was created.
 
-The original data set was filtered for magnesium lab values occurring between midnight and 10 am.  
 
-This produced a table of 28,681 magnesium windows.  When this was filtered for clinician identifiers being present this reduced to 13,050 magnesium windows.
+After applying filtering conditions as displayed, we used a dataset of 10,298 windows, with 180 instances of AF. 
 
-There were 715 individual clinicians identified within this filtered dataset.  The number of magnesium windows associated with each clinician ID ranged between 1 and 237 (median 3, IQR 1 - 26).
+There were 669 unique day nurses in this dataset.
 
-44% of these magnesium windows received a magnesium administration.  3.34% went on to develop AF within the magnesium window.
+
+<!-- The original data set was filtered for magnesium lab values occurring between midnight and 10 am.   -->
+
+<!-- This produced a table of 28,681 magnesium windows.  When this was filtered for clinician identifiers being present this reduced to 13,050 magnesium windows. -->
+
+<!-- There were 715 individual clinicians identified within this filtered dataset.  The number of magnesium windows associated with each clinician ID ranged between 1 and 237 (median 3, IQR 1 - 26). -->
+
+<!-- 44% of these magnesium windows received a magnesium administration.  3.34% went on to develop AF within the magnesium window. -->
 
 
 
