@@ -33,11 +33,149 @@ Magnesium is also frequently supplemented in ICU to maintain normal, or occasion
   * Treatment of moderate-severe exacerbations of asthma
   * Treatment of hypokalaemia
   
-It is a commonly held belief that magnesium supplementation in a critical care setting is efficacious as prophylaxis against developing de novo atrial fibrillation *[REF]*.
+It is a commonly held belief that magnesium supplementation in a critical care setting is efficacious as prophylaxis against developing de novo atrial fibrillation.
 
-This belief stems from a plausible biological mechanism of action, in addition to multiple observational studies.  
+This belief stems from a plausible biological mechanism of action, in addition to multiple observational studies and randomised controlled trials.  
 
-In their retrospective analysis of 3530 patients from the Framingham Offspring Study, Khan et al found a moderate association between hypomagnesaemia and subsequent development of atrial fibrillation (adjusted HR 1.52, 1.00 - 2.31, P = 0.05).  
+## Existing Literature
+
+**Meta-Analyses**
+
+1.  Intravenous magnesium prevents atrial fibrillation after coronary artery bypass grafting: a meta-analysis of 7 double-blind, placebo-controlled, randomised trials, 2012.
+
+Pooled analysis showed significantly reduced postoperative AF (RR 0.64) with magnesium treatment with no heterogeneity.
+
+
+**Systematic Reviews**
+
+1.  Interventions for preventing postoperative atrial fibrillation in patients undergoing heart surgery, Cochrane Review, 2013.
+
+21 RCTs of 2988 patients undergoing cardiac surgery.  All mg dosing IV but dosing varied, half studies had intra-op magnesium.
+
+Pooled analysis showed significantly reduced postop AF in treatment group (16.5%) vs. control (26.2%), OR 0.55.
+
+
+**Randomised Controlled Trials**
+
+1.  Effects of intravenous magnesium sulphate in suspected acute myocardial infarction on acute arrhythmias and long term outcome, 1995. 
+
+
+**Literature Reviews**
+
+1.  New-onset atrial fibrillation in adult patients after cardiac surgery, 2019.
+
+Incidence of AF after non-cardiac surgery estimated between 1 and 15% (10-30% for thoracic surgery, 25-50% after cardiac surgery).  
+
+Good data that postop AF is associated with badness (stroke, infection, GI and renal dysfunction, increased short and long term morbidity and mortality, increased length of hospital stay).  
+
+Multifactoral pathogenesis.  Risk factors for atrial stretch include hypertension, myocardial ischaemia, valvular dysfunction such as mitral regurgitation.  Postop pro-arrhythmogenic factors include increased endogenous catecholamines, inflammatory and oxidative mediators, plus the use of exogenous catecholamines.
+
+More general risk factors:
+  - History of PAF
+  - Obesity
+  - COPD
+  - Chronic renal failure
+  - Rheumatic heart disease
+  - Male gender
+  - Age
+
+In cardiac surgery two periods of increased risk have been identified, immediate (zero hour to first 18 hours postop) and delayed (24-48 hours).  
+
+
+**Observational**
+
+1.  Low serum magnesium and the development of atrial fibrillation in the community: The Framingham Heart Study, 2013.
+
+In their retrospective analysis of 3530 patients from the Framingham Offspring Study, Khan et al found a moderate association between hypomagnesaemia and subsequent development of atrial fibrillation (adjusted HR 1.52, 1.00 - 2.31, P = 0.05).
+
+
+2.  Are serum magnesium and potassium levels associated with atrial fibrillation following cardiac surgery? 2019.
+
+In this observational cohort study, Howitt et al reviewed heart rhythm data for 3068 post cardiac surgery patients.  The incidence of AF was 17.8%.  After adjusting for logistic EuroScore, operation type, bypass time and age they found potassium < 4.5 associated with AF (OR 1.43), mean magnesium < 1 was not associated with AF, but administration of magnesium was associated with increased risk of developing AF.  
+
+
+3.  Potassium and magnesium supplementation do not protect against atrial fibrillation after cardiac surgery: a time-matched analysis, 2016.
+
+
+4.  Database evaluation of the association between serum magnesium levels and the risk of atrial fibrillation in the community, 2015.  
+
+
+5.  Association of serum magnesium on mortality in patients admitted to the intensive care unit, 2017.
+
+
+
+```{r}
+lit <-
+  tibble(
+  Study = c("Khan et al",
+            "Howitt et al",
+            "Lancaster et al",
+            "Markovits et al",
+            "Naksuk et al",
+            
+            "Arsenault et al",
+            "Gu et al"),
+  
+  Journal = c("Circulation",
+              "Journal of Cardiothoracic and Vascular Anesthesia",
+              "Annals of Thoracic Surgery",
+              "International Journal of Cardiology",
+              "American Journal of Medicine",
+              
+              "Database of Cochrane Reviews",
+              "Trials"),
+  
+  Year = c(2013,
+           2019,
+           2016,
+           2015,
+           2017,
+           
+           2013,
+           2012),
+  
+  Type = c("Observational",
+           "Observational",
+           "Observational",
+           "Observational",
+           "Observational",
+           
+           "Systematic Review",
+           "Meta-Analysis"),
+  
+  Design = c("Retrospective Cohort",
+             "Retrospective Cohort",
+             "Retrospective Case-Control: Time-Matched Analysis",
+             "Retrospective Cohort",
+             "Retrospective Cohort",
+             
+             "Cochrane Review",
+             "Meta-Analysis"),
+  
+  Population = c("Community, US",
+                 "Post Cardiac Surgery, UK",
+                 "Post Cardiac Surgery, US",
+                 "Community, Israel",
+                 "Cardiac Care Unit (Medical), US",
+                 
+                 "Post Cardiac Surgery",
+                 "Post Coronary Artery Bypass Grafting"),
+  
+  Findings = c("Low magnesium associated with developing AF in the community",
+               "Potassium < 4.5 associated with AF; mean Mg < 1 not associated with AF; administering Mg associated with AF",
+               "Higher potassium and magnesium associated with AF; magnesium independent predictor of AF in multivariate analysis; magnesium supplementation associated with increased AF.",
+               "Increased AF associated with mild and moderate hypomagneseaemia, not time-dependent suggesting non-causal relationship",
+               "Increased mortality associated with Mg > 1.2 in multivariate analysis",
+               
+               "Significantly decreased postoperative AF with treatment vs. control",
+               "Significantly decreased postoperative AF with magnesium with minimal heterogeneity between trials")
+  
+)
+
+kable(lit)
+```
+
+
 
 
 
@@ -572,12 +710,6 @@ knitr::include_graphics("./images/tte_analysis.PNG")
 ```
 
 
-Cox proportional hazards regression.
-
-```{r}
-knitr::include_graphics("./Images/cox_results.png")
-```
-
 
 ## Instrumental Variable Analysis
 
@@ -585,19 +717,13 @@ knitr::include_graphics("./Images/cox_results.png")
 
 To facilitate investigation of a causal relationship between clinician and administration of magnesium, a stricter time window was created.
 
+The original data set was filtered for magnesium lab values occurring between midnight and 10 am.  
 
-After applying filtering conditions as displayed, we used a dataset of 10,298 windows, with 180 instances of AF. 
+This produced a table of 28,681 magnesium windows.  When this was filtered for clinician identifiers being present this reduced to 13,050 magnesium windows.
 
-There were 669 unique day nurses in this dataset.
+There were 715 individual clinicians identified within this filtered dataset.  The number of magnesium windows associated with each clinician ID ranged between 1 and 237 (median 3, IQR 1 - 26).
 
-
-<!-- The original data set was filtered for magnesium lab values occurring between midnight and 10 am.   -->
-
-<!-- This produced a table of 28,681 magnesium windows.  When this was filtered for clinician identifiers being present this reduced to 13,050 magnesium windows. -->
-
-<!-- There were 715 individual clinicians identified within this filtered dataset.  The number of magnesium windows associated with each clinician ID ranged between 1 and 237 (median 3, IQR 1 - 26). -->
-
-<!-- 44% of these magnesium windows received a magnesium administration.  3.34% went on to develop AF within the magnesium window. -->
+44% of these magnesium windows received a magnesium administration.  3.34% went on to develop AF within the magnesium window.
 
 
 
@@ -619,13 +745,6 @@ Provisional set of analysis for 39,531 magnesium windows has suggested a possibl
 
 # Next Steps
 
-
-
-- Add additional covariates:
-  - Serum creatinine at magnesium lab measurement (as indicator of CRF)
-  - Potassium at time of mg administration & time of af event
-  - Indicators of previous atrial fibrillation
-  - Serum pH, bicarbonate, PaCO2 (as indicator of biochemical state)
 
 - Evaluate pipeline integrity:
   - via lab meeting
