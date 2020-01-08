@@ -441,8 +441,6 @@ kable(cpr, caption = "CPR in 24 hours prior to admission")
 Unit mortality 9.25% across all selected episodes.  The mean serum magnesium on admission for surviving patients was 0.795 mmol/L, versus 0.868 mmol/L for those who died.
 
 
-
-
 ## Magnesium 
 
 The distribution of serum magnesium measurements on first arrival to ICU is described below.  The admission serum magnesium is defined as the first recorded magnesium lab measurement associated with the episode following the final joining process.  
@@ -547,7 +545,7 @@ The mean pH across all the magnesium windows was 7.38 (sd, 0.07).
 
 ## Atrial Fibrillation
 
-There were 639 episodes which started in AF.  AF events were defined as rhythm changes from sinus rhythm or "other" to AF within the magnesium window.  453 episodes contained at least one AF event.  912 magnesium windows contained at least one AF event.  
+There were 639 episodes which started in AF. AF events were defined as rhythm changes from sinus rhythm or "other" to AF within the magnesium window.  453 episodes contained at least one AF event.  912 magnesium windows contained at least one AF event.  
 
 The mean serum magnesium at the start of the magnesium window for windows with no AF events was 0.93 mmol/L.
 
@@ -557,18 +555,8 @@ The mean serum magnesium at the start of the magnesium window for windows contai
 knitr::include_graphics("./images/mg_lab_af_dist.png")
 ```
 
-
-
-
 # Table 1
-
-
-
-
-
 ## Summary of Variables Per Episode
-
-
 
 ```{r, results='asis', echo=FALSE}
 
@@ -610,10 +598,6 @@ kable(table1, caption = "Summary of Characteristics Per Patient Episode")
 ```
 
 
-
-
-
-
 ## Summary of Variables Per Magnesium Window
 
 This is a summary of each magnesium window after applying exclusion criteria of age < 18 years old.
@@ -653,45 +637,29 @@ kable(table2, caption = "Summary of Characteristics Per Magnesium Window")
 ```
 
 
-
-
-
 # Analysis
 
+## The relationship between serum magnesium level and incidence of AF. 
 
-## Logistic Regression
+### Logistic regression model. 
 
-
-Simple logistic regression model:
-
-```{r, echo = FALSE}
-
-# reg <- 
- # glm(af_event ~ serum_mg, data = tbl2, family = "binomial")
-
-#summary(reg)
-
-#exp(1.4763) # 4.377 (odds) per 1 unit mg (i.e. 0.44 increased odds for every 0.1 mmol/L increase in serum mg)
-```
-
-This suggests that a one unit increase in serum magnesium is associated with a 1.48 increase in log odds of having an AF event (p < 0.001), or a 0.44 increased odds of developing AF for every 0.1 mmol/L increase in serum magnesium.
+We ran a logistic regression to explore the relationship between serum magneisum level and incidence of AF. The results are displayed below. 
 
 ```{r, echo=FALSE}
 knitr::include_graphics("./Images/mg_af_glm_smooth.PNG")
 ```
 
-After the addition of age, sex, APACHE score, potassium and creatinine at the time of mg measurement to the model:
+This suggests that a one unit increase in serum magnesium is associated with a 1.48 increase in log odds of having an AF event (p < 0.001), or a 0.44 increased odds of developing AF for every 0.1 mmol/L increase in serum magnesium.
 
+The result that a higher serum mangesium level is associated with a greater incidence of AF holds after the addition of the variables age, sex, APACHE score, serum potassium and creatinine 
 
 ```{r, echo=FALSE}
 knitr::include_graphics("./Images/log_reg_result.PNG")
 ```
 
+### Time to Event Analysis
 
-
-
-
-## Time to Event Analysis
+We tried to further investigate the relationship between serum magneisum level and incidence of AF by performing a survival analysis as follows. 
 
 Censor variables were created, starting from the magnesium lab date for each window.  All windows were censored if they reached the end of the window, defined as the minimum of the next magnesium lab measurement, the end of the episode or 24 hours.  Windows were censored if magnesium was administered or the outcome occurred (AF event).
 
@@ -712,7 +680,6 @@ table3 <- tibble(
 
 kable(table3, caption = "Times to events")
 ```
-
 
 Serum magnesium was initially categorised into low vs. high (serum mg < 1, low).  
 
@@ -744,46 +711,93 @@ knitr::include_graphics("./images/tte_analysis.PNG")
 
 
 
-## Instrumental Variable Analysis
+## Investigation of the causal relationship between supplementation of magneiusm and incidence of AF.
 
-### Description of Nurse Data
+We attempted to investigate the potential causal relationship between magneisum supplemenation and incidence of AF. 
 
-To facilitate investigation of a causal relationship between clinician and administration of magnesium, a stricter time window was created.
+We use an instrumental variable method to do this. 
+The reason we are doing IV analysis is that we think any correlation between supplemenation and getting AF may be confounded by unobserved variables (ie, the error term when doing a regression of supplemenation against AF is correlated with the explanatory variable(was mg given or not?)). 
+We use an instrumental variable analysis to try to get around this problem. 
+We use a 2 stage least squares regression here. 
 
-<<<<<<< HEAD
-A dataset with more restricted time windows was created for the IV analysis. It consists of 9620 time windows with 164 instances of AF.
+The instrumental variable analysis tries to investigate a potential causal relationship between supplementation of serum magnesium and AF using the propensity of the nurse to prescribe magneisum as an instrumental variable. 
 
-Summary information about the data is displayed below.
-=======
-The original data set was filtered for magnesium lab values occurring between midnight and 10 am.  
+### Preparation of dataset for instrumetal variable analysis. 
 
-This produced a table of 28,681 magnesium windows.  When this was filtered for clinician identifiers being present this reduced to 13,050 magnesium windows.
+To facilitate investigation of a causal relationship between clinician and administration of magnesium, stricter exclusion criteria were applied as displayed below.
 
-There were 715 individual clinicians identified within this filtered dataset.  The number of magnesium windows associated with each clinician ID ranged between 1 and 237 (median 3, IQR 1 - 26).
-
-44% of these magnesium windows received a magnesium administration.  3.34% went on to develop AF within the magnesium window.
-
->>>>>>> 79ad3618e0e46da1c68f58f02d19da32d72138f0
+```{r, echo=FALSE}
+knitr::include_graphics("./Images/mg iv dataset.png")
+```
 
 ```{r, echo = FALSE}
 table4 <- data.frame(
-  no_AF = c(5715, 3741),
-  AF = c(126, 38))
+  no_AF = c(5410, 160),
+  AF = c(3508, 51))
 rownames(table4) <- c("no Mg given", "Mg given")
 
 kable(table4)
 ```
 
-There were 643 unique day nurses in this dataset.
-55 windows where no mg was given until after the first AF. These were treated as instances of AF with no magnesium administered.
+There were 574 individual clinicians identified within this filtered dataset.  The number of magnesium windows associated with each clinician ID ranged between 1 and 119 (median 4, IQR 1 - 26).
 
-The number of windows per nurse ranged from 1 to 117 with a median of 4(1-24). 
+### Initial logistic regression to look at association between supplementation and AF.
+
+The results of the regression are displayed below. There appears to be a negative relationship between mag supplementation and AF. So giving mg supplements is associated with a lower probability of getting AF.
+However, we can't give this a causal interpretation.
+
+```{r, echo = FALSE}
+knitr::include_graphics("./Images/regresssion_af_admin.png")
+```
+
+### Division of nurses into groups
+
+We used a logistic regression to divide nurses into groups based on their probability of giving magneisum suppplements to patients at given levels of serum magnesium. 
+The predicted probabilites fell into roughly 3 groups, which we classified as 'always supplements', 'sometimes supplements' and 'never supplements'. 
+
+The grouping of nurses are shown below. 
+
+```{r, echo = FALSE}
+table5 <- data.frame(
+  names = c("Total nurses", "Does not supplement frequently", "Sometimes supplements", "Frequently supplements"),
+  numbers = c(574, 175, 327, 72))
+
+kable(table5)
+```
+
+The grouping of always, sometimes, never seems to be confirmed by comparing predictions for each combination of serum mg and nurse with the nurse groupings. This is displayed in the graph below. 
+
+```{r, echo = FALSE}
+knitr::include_graphics("./Images/nurse_groupings.png")
+```
 
 
+### Instrumental variable analysis.
+
+We used a 2 stage least squares method to perform the instrumental variable analysis. 
+We followed this tutorial. http://eclr.humanities.manchester.ac.uk/index.php/IV_in_R.
+Since the AER package can't does not support logistic regression, I am also using the answer to this stack oververflow question to implement the logistic regression. 
+https://stackoverflow.com/questions/30978507/two-stage-least-squares-regression-with-biomial-response-variable
+
+We want to know if giving mg supplements prevents AF. 
+
+The first stage was to do a regression to predict magneisum supplementation based on nurse group. 
+We then fed those predictions into a regression model with AF as the dependent variable and the prediction as the independent variable. 
+I think?? using the prediction instead of the actual variable indicating if supplementation happened or not removes the variability which may have been caused by unobserved confounding. 
+
+The code and results are displayed below. 
+
+```{r, echo = FALSE}
+knitr::include_graphics("./Images/iv_code.png")
+```
+
+```{r, echo = FALSE}
+knitr::include_graphics("./Images/iv_results.png")
+```
+
+I think? this means that magnesuium supplementation does not have a causal effect on incidence of AF.
 
 # Discussion
-
-
 
 Provisional set of analysis for 39,531 magnesium windows has suggested a possible association betweeen higher magnesium levels and onset of atrial fibrillation within the magnesium window.  This association is demonstrated across both basic logistic regression and a time to event analyses.  Once adjusted for age, sex, illness severity and potassium level a significant association persists.
 
