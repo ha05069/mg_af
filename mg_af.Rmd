@@ -1,0 +1,781 @@
+---
+title: "Magnesium Administration and Atrial Fibrillation"
+author: "M Wilson"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+csl: vancouver.csl
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/mwils/Documents/Work_Academic/PhD/2019-20/Mg_AF/Manuscripts")
+
+require(knitr)
+library(tidyverse)
+library(tableone)
+library(kableExtra)
+```
+
+This report represents the current status of this project as of `r Sys.Date()`.
+
+# Issues:
+
+- Implementing IV Probit for binary outcome
+  - "Error in chol.default(mat) : the leading minor of order 3 is not positive definite"
+
+
+# Introduction
+
+
+
+## Magnesium in Critical Care
+
+Serum Magnesium (Mg) concentration is a commonly measured blood test performed on patients admitted to Critical Care Units.  Mg is the fourth most abundant cation in the body.  Predominantly concentrated intracellularly, it is responsible for enzyme processes, DNA and cell membrane stabilisation and regulation of cardiac and smooth muscle tone.  Specifically at the myocardial level it regulates the activity of the sodium/potassium ATPase pump, integral to normal cardiac automaticity [@hansen2018b]. 
+
+The normal serum range for Mg is 0.6 to 1.0 mmol/L (1.5 - 2.4 mg/dL) [@rumsby2017]. 
+
+Previous studies of Mg in Critical Care have suggested the majority of patients are deficient (serum concentration < 0.6 mmol/L) via multiple aetiologies.  In addition, since the predominance of Mg in the body is stored intracellularly, measured serum concentrations are poorly reflective of whole body stores [@hansen2018b].  
+
+As such, Mg is also frequently supplemented to maintain normal, or occasionally supra-normal serum concentrations, either via enteral or intravenous routes.  The intended consequences of the normalisation of serum Mg include prevention of cardiac dysrhythmia (including atrial fibrillation, AF), the treatment of cardiac dysrhythmia (AF or Torsades de Pointes), routine management of conditions including Eclampsia, exacerbations of Asthma and the correction of hypokalaemia [@tong2005].
+
+It is a commonly held belief that Mg supplementation in Critical Care is efficacous as prophylaxis against the development of de novo AF.  This belief stems from a plausible biological mechanism of action, in addition to multiple observational studies and randomised controlled trials [@khan2013; @howitt2019; @lancaster2016; @markovits2016; @naksuk2017a].
+
+
+
+## Atrial Fibrillation in Critical Care
+
+Much of the evidence for the efficacy of supplemental Mg administration has been derived from the cardiac surgery population where AF is a commonly occurring complication with significant attributed morbidity and mortality attached to it.  The incidence of AF in the non-cardiac Critical Care population has been estimated between 1 and 15% [@burrage2019], versus 25-50% for some types of cardiac surgery (combination valve replacement and bypass grafting conveying the highest risk) [@arsenault2013].
+
+A summary of the most recent existing literature in this area is shown in **Table 1**.  Interestingly, there appears to be polarisation in observed treatment effect, with the majority of observational studies finding deleterious effects with higher Mg levels (for both incidence of AF and mortality in some instances) and experimental studies finding the opposite effect.  Whilst there may be numerous reasons for observing this difference, intuitively this suggests an element of unobserved confouding present in observational work which is potentially influencing the direction of any treatment effect.
+
+
+
+## A Question Answered?
+
+Whilst the bulk of conducted experimental work has identified a protective effect of Mg and Mg supplementation on the occurrence of AF, the majority of this work has been conducted in the cardiac population and not the general Critical Care population (consisting of a heterogenous mixture of surgical and medical patients).  As such it may be difficult to generalise these findings to justify routine Mg supplementation as a preventative strategy for AF in this population.  Randomised Controlled Trials (RCTs) have become increasingly time consuming and expensive to perform and for interventions now considered routine such as Mg supplementation they may prove difficult to fund.  As such observational research, particularly in the era of expanding quantity and quality of Critical Care datasets provided by electronic health record systems continue to play a role in exploring these questions.
+
+One way to overcome the lack of randomisation may be to harness quasi-experimental methodologies, such as Instrumental Variable analysis (IV) to deal with elements of unobserved confounding.  
+
+
+
+## A Natural Experimental Solution?
+
+IV analysis has predominantly been utilised in the social sciences and econometrics literature to gain insight from situations which would not be amenable to a standard RCT.  
+
+Examples of IV analysis in the medical literature include the use of critical care capacity to assess the effect of delayed admission on patient outcome [@harris2018b].  Prescribing preferences have been used as an instrument to assess efficacy of different neuroleptic agents in primary care [@brookhart2006]. IV approaches have also been utilised to compare efficacy of surgical interventions versus less invasive endovascular approaches to managing carotid artery stenosis [@columbo2018]. 
+
+An IV approach seeks to find a variable which causes natural randomisation with respect to the intervention, but is unrelated to the outcome being measured (other than through the intervention).  We assert that the bedside critical care nurse may be a suitable instrument for examining the relationship between Mg supplementation and AF.
+
+There are three main criteria against which a proposed instrument should be assessed.  First, the assignment of the instrument should be random in nature (i.e. patients are unable to choose their allocated bedside nurse and vice versa).  Second, the instrument should not be a significant variable in determining variation in the outcome event (i.e. the bedside nurse should not be able to directly influence whether the patient experiences AF or not, other than via the intervention).  Finally, the instrument should affect the intervention (i.e. giving supplemental Mg should occur via the bedside nurse).  Of all these conditions, only the final one is objectively proveable, however the justification for the first two conditions is clinically sound.
+
+
+Therefore this study aims to assess whether an IV technique may be applied to study the causal effect of administering supplemental Mg on the outcome of de novo AF in a general Critical Care population.  
+
+
+# Aims
+
+1.  Assess the suitability of using ICU nurse prescribing preference as an instrumental variable to investigate the association between supplemental magnesium administration and de novo atrial fibrillation in a general intensive care unit population.
+
+
+
+
+# Methods
+
+
+## Design
+
+A retrospective observational analysis of data from a single tertiary Intensive Care Unit.
+
+An instrumental variable analysis of the effect of supplemental Mg administration and the incidence of new onset AF.
+
+
+
+## Ethics
+
+Data access was provided via the Critical Care Health Informatics Collaborative Scientific Advisory Group.  All data handling and processing was conducted within the UCL Integrated Data Handling Solution Data Safe Haven.  
+
+
+
+## Data Sources
+
+
+The Philips ICIP database was interrogated for serum Mg lab measurements, Mg administration and nurse identifier data, from February 2014 till February 2018.
+
+The Critical Care Health Informatics Collaboration database was used to extract data pertaining to the following for the same time period [@harris2018a]:
+
+* Age at admission
+* Sex
+* Length of stay
+* Admission classification
+* Illness severity by APACHE score
+* CPR in 24 hours prior to admission
+* Unit mortality
+* Heart rhythm
+* Heart rate
+* Serum potassium lab and point of care measurements
+
+Data was joined using unique patient identity numbers.  
+
+
+
+## Data Cleaning
+
+In order to derive the maximum number of opportunities to study the effect of Mg supplementation on AF, the data was formatted into "Mg Windows", as shown in **Figure 1**.  A Mg window begins with the measurement of a patient's serum Mg, in most patients this occurs on a once daily basis, but occasionally more often.  Each serum Mg measurement provides information upon which a decision to supplement (or not) is made.  
+
+Each time window is terminated by the next serum Mg measurement, the end of the patient episode, or at 24 hours from first measurement.  
+
+In order to reliably match a single bedside nurse identifier to each Mg window, only day shift windows were considered, identified by selecting serum Mg results recorded between midnight and 0800.
+
+
+
+## Exclusion Criteria
+
+1.  Patients < 18 years old at the time of ICU admission.
+2.  Data from 2016 - 2017 was used for the analysis due to large amounts of missing data for nurse identity present throughout the rest of the years.
+3.  In order to maintain the integrity Mg window (and the causal relationships between Mg observation, administration and AF events), Mg measurements outside midnight and 8 a.m. were excluded.
+4.  Patients in AF at the beginning of the Mg window were excluded.
+5.  Patients who went into AF or received supplemental Mg following Mg measurement, but preceding the day nurse shift start (0800) were excluded.
+6.  Patients who received supplemental Mg after an AF event were excluded to remove AF treatment as an indication for Mg administration.
+
+Only cases with complete data were used for the analysis.  
+
+
+## Statistical Analysis
+
+The aim of the primary analysis was to estimate the effect of Mg supplementation at a given measured serum Mg level on the outcome of new onset AF during the observation window.
+
+In order to divide the nurse cohort into "Pro" and "Anti" Mg supplementation groups, a logistic regression was performed to predict Mg Administration.  The null model Mg Administration ~ Nurse ID was compared with a nested multilevel model, using nurse ID as a level 2 random effect.  The single level and multilevel null model were compared with a likelihood ratio test to determine the significance of the individual nurse.
+
+A multivariate two-level model was then constructed, keeping nurse as the random effect.  Relevant covariates were added including serum Mg level, patient age, presence of tachycardia, illness severity (APACHE II) and previous AF.  Where the inclusion of continuous variables resulted in failure of model convergence, the variable was made binary according to clinically relevant cut points outlined below.
+
+A dummy variable was created to represent tachycardia during the Mg window.  The median heart rate across the rhythm was calculated and labelled as tachycardic if > 100 beats per minute.
+
+APACHE score was dichotomised into high or low based on a cut point of 25, representing around 50% predicted mortality.  Age was also dichotomised around the median value of 63 years old. 
+
+Each Mg window was assigned a dummy variable encoding whether there had been any recorded AF events in the preceding windows, for that episode of care.  This allowed evaluation of whether or not a history of AF prior to the Mg window but still in the patient's episode of care was a relevant determining factor in the administration of Mg. 
+
+From the multivariate two-level model, predicted probabilities of Mg administration for each nurse were obtained.  
+
+The model coefficients for each nurse were used to create Pro and Anti Mg groups.  To ensure the groups were sufficiently different, the middle third of nurse data was removed.  Finally the upper and lower third groups were combined and divided along the mean coefficient.  
+
+Using the groups created a two stage OLS regression was performed using nurse group as an instrumental variable and including significant covariates from the multilevel model.
+
+Statistical analysis was performed in R [@rstudioteam2018].  A list of packages can be found in Appendix 1.  
+
+
+
+
+# Results
+
+## Sample Characteristics
+
+After joining ICIP data to CCHIC data and formatting into observation windows based on serum Mg measurements there were 38,222 recorded lab measurements across 6675 episodes of care for 5739 patients, from February 2014 to February 2018.  After examining the distribution of the data across each year, only data from 2016-2017 was selected, due to large quantities of missing data for nurse identification across the other years.  
+
+After applying the remaining exclusion criteria and removing rows with missing covariate data, 9064 observation windows remained for 2197 episodes of care for 1968 patients.  There were 574 individual nurse IDs.  The median number of observations per nurse was 4 (IQR: 1 - 26).  *Table 2* summarises the characteristics of the sample population.  *Figure 2* shows the Consort diagram.    
+
+
+## Multi-level Analysis & Nurse Group Creation
+
+A two-level logistic regression was performed to assess the effect of individual nurses on the outcome of Mg administration, in order to define two study groups for the IV analysis.  *Table 3* illustrates the results for the null model two-level logistic regression for nurse groups.  The estimate of the intercept, the log odds of receiving Mg from an average nurse was estimated at -0.49.  The between nurse variance in the null model was 14.0%.  The null model was compared to the equivalent single level model and the null hypothesis of no contribution by nursing groups tested with a likelihood ratio test (Chi-squared value 93.01, p < 0.001).  This suggests that there is strong evidence that the between nurse difference is not zero.  
+
+*Table 4* shows the output from the multivariate two-level model.  Clinically relevant variables were added in a step-wise fashion, where the model failed to converge, the most non-significant variable was removed and the model re-run.  
+
+This model was used to produce predicted probabilities for Mg administration for each nurse, illustrated in *Figure 3*.  The distribution of nurse coefficients is displayed in *Figure 4*.  Many nurses were not substantially differentiated by the model (likely due to the low observation rate for some individuals).  In order to differentiate Pro and Anti Mg groups, the middle third of observations were removed, leaving 5187 observations for 242 nurses.  This was then divided down the median value for nurse coefficient into Pro and Anti Mg groups, the characteristics of these groups are displayed in *Table 5*, alongside characteristics for the two groups when divided by mean nurse coefficient.  
+
+The results of the Instrumental Variable Analysis presented here use the median-derived nurse groups.
+
+
+## Instrumental Variable Analysis
+
+The results of the multivariate IV model using Pro and Anti Mg group as an instrument are presented in *Table 6*.  
+
+
+The instrument was tested for validity by comparing the first stage model for Mg Administration to one that includes nurse group via a Wald Test. The F statistic was 94.389, p < 0.001; suggesting that nurse group explains a significant proportion of the variability in Mg Administration, after accounting for Serum Mg level.
+
+Using the residuals from the first stage model, a Hausman Wu test was conducted to test for exogeneity.  The p value of 0.02592 suggests we can reject the null hypothesis of Mg Administration be exogenous, confirming that conducting an IV analysis is technically beneficial compared to standard OLS methods.
+
+For comparison, *Table 7* contains the output from a single level logistic regression of AF event on all the covariates included in the IV regression, including Mg Group. 
+
+
+
+# Tables and Figures
+
+## Table 1 ~ Summary of Existing Literature
+
+```{r, echo=FALSE}
+lit <-
+  tibble(
+  Study = c("Khan et al",
+            "Howitt et al",
+            "Lancaster et al",
+            "Markovits et al",
+            "Naksuk et al",
+            
+            "Arsenault et al",
+            "Gu et al"),
+  
+  Journal = c("Circulation",
+              "Journal of Cardiothoracic and Vascular Anesthesia",
+              "Annals of Thoracic Surgery",
+              "International Journal of Cardiology",
+              "American Journal of Medicine",
+              
+              "Database of Cochrane Reviews",
+              "Trials"),
+  
+  Year = c(2013,
+           2019,
+           2016,
+           2015,
+           2017,
+           
+           2013,
+           2012),
+  
+  Type = c("Observational",
+           "Observational",
+           "Observational",
+           "Observational",
+           "Observational",
+           
+           "Systematic Review",
+           "Meta-Analysis"),
+  
+  Design = c("Retrospective Cohort",
+             "Retrospective Cohort",
+             "Retrospective Case-Control: Time-Matched Analysis",
+             "Retrospective Cohort",
+             "Retrospective Cohort",
+             
+             "Cochrane Review",
+             "Meta-Analysis"),
+  
+  Population = c("Community, US",
+                 "Post Cardiac Surgery, UK",
+                 "Post Cardiac Surgery, US",
+                 "Community, Israel",
+                 "Cardiac Care Unit (Medical), US",
+                 
+                 "Post Cardiac Surgery",
+                 "Post Coronary Artery Bypass Grafting"),
+  
+  Findings = c("Low magnesium associated with developing AF in the community",
+               "Potassium < 4.5 associated with AF; mean Mg < 1 not associated with AF; administering Mg associated with AF",
+               "Higher potassium and magnesium associated with AF; magnesium independent predictor of AF in multivariate analysis; magnesium supplementation associated with increased AF.",
+               "Increased AF associated with mild and moderate hypomagnesaemia, not time-dependent suggesting non-causal relationship",
+               "Increased mortality associated with Mg > 1.2 in multivariate analysis",
+               
+               "Significantly decreased postoperative AF with treatment vs. control",
+               "Significantly decreased postoperative AF with magnesium with minimal heterogeneity between trials")
+  
+)
+
+lit %>% 
+  kable(caption = "Summary of Existing Literature") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) %>% 
+  column_spec(7, width = "30em")
+```
+
+
+
+## Table 2 ~ Characteristics of the Sample Population
+
+```{r, results='asis', echo=FALSE}
+
+# per episode using tbl4 from 14_IV_dataset_creation.R
+# n = 9064, 2197 episodes, 1968 patients, 574 nurses
+
+table2 <- tibble(
+  Variable = c("Age (Years), Median (IQR)",
+              "Sex (%)",
+              "Length of Stay (Days), Median (IQR)",
+              
+              "APACHE Score, Median (IQR)",
+        
+              "Unit Mortality (%)",
+              "Mean (sd) Serum Potassium (mmol/L)",
+              
+              "Mean (sd) Serum Magnesium (mmol/L)",
+
+              "Proportion Receiving Magnesium Administration (%)",
+              "AF Events (%)"),
+  
+  Summary = c("63 (51-71)",
+             "Female: 42.3",
+             "13.55 (5.2-36.2)",
+             
+             "20 (15-24)",
+             "16.97",
+         
+             "4.58 (0.50)",
+             
+             "0.95 (0.20)",
+             
+             "39.27",
+             "146 (1.61)"
+             ))
+                                
+
+table2 %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+## Table 3 ~ Results of Null Two-Level Model 
+
+Mg Administration ~ 1 + (1 | Nurse)
+
+**Model Information:**
+
+*Observations:* 9064
+
+*Dependent variable:* Mg Administration
+
+*Type:* Mixed effects generalised linear regression
+  *Family:* Binomial
+  *Link Function:* Logit
+
+
+**Model Fit:**
+
+AIC = 12055.29, BIC = 12069.52
+
+Pseudo-R squared (*fixed effects*) = 0.00
+Pseudo-R squared (*total*) = 0.04
+
+
+**Fixed Effects:** 
+
+```{r, echo = FALSE}
+mlm1 <- 
+  tibble(
+    "   " = c("(Intercept)"),
+    
+    "Estimate" = -0.49,
+    
+    "Standard Error" = 0.03,
+    
+    "Z Value" = -15.14,
+    
+    "p Value" = 0.00)
+
+mlm1 %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+
+
+**Random Effects:**
+
+```{r, echo = FALSE}
+mlm2 <- 
+  tibble(
+    "Group" = c("Nurse"),
+    
+    "Parameter" = c("Intercept"),
+    
+    "Standard Deviation" = 0.37
+  )
+mlm2 %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+
+
+**Grouping Variables:**
+
+```{r, echo = FALSE}
+mlm3 <- 
+  tibble(
+    "Group" = c("Nurse"),
+    
+    "Group Number" = c(574),
+    
+    "Intraclass Correlation Coefficient" = c(0.04)
+  )
+mlm3 %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+
+
+## Table 4 ~ Results of Multivariate Two-Level Model 
+
+Mg Administration ~ Serum_Mg + Age + Heart Rate + APACHE Score + Previous AF + (1 | Nurse)
+
+**Model Information:**
+
+*Observations:* 9064
+
+*Dependent variable:* Mg Administration
+
+*Type:* Mixed effects generalised linear regression
+  *Family:* Binomial
+  *Link Function:* Logit
+
+
+**Model Fit:**
+
+AIC = 8554.12, BIC = 8603.91
+
+Pseudo-R squared (*fixed effects*) = 0.53
+Pseudo-R squared (*total*) = 0.57
+
+
+**Fixed Effects:** 
+
+```{r, echo = FALSE}
+mlm1 <- 
+  tibble(
+    "   " = c("(Intercept)",
+              "Serum Mg",
+              "Age",
+              "Tachycardia",
+              "APACHE",
+              "Previous AF"),
+    
+    "Estimate" = c(8.13,
+                   -9.81,
+                   0.08,
+                   0.48,
+                   0.21,
+                   0.39),
+    
+    "Standard Error" = c(0.20,
+                         0.23,
+                         0.06,
+                         0.07,
+                         0.07,
+                         0.08),
+                         
+    
+    "Z Value" = c(40.19,
+                  -42.73,
+                  1.38,
+                  6.60,
+                  3.17,
+                  4.89),
+    
+    "p Value" = c(0.00,
+                  0.00,
+                  0.17,
+                  0.00,
+                  0.00,
+                  0.00))
+
+mlm1 %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+
+
+**Random Effects:**
+
+```{r, echo = FALSE}
+mlm2 <- 
+  tibble(
+    "Group" = c("Nurse"),
+    
+    "Parameter" = c("Intercept"),
+    
+    "Standard Deviation" = 0.56
+  )
+mlm2 %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+
+
+**Grouping Variables:**
+
+```{r, echo = FALSE}
+mlm3 <- 
+  tibble(
+    "Group" = c("Nurse"),
+    
+    "Group Number" = c(574),
+    
+    "Intraclass Correlation Coefficient" = c(0.09)
+  )
+mlm3 %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+
+## Table 5 ~ Characteristics of Pro and Anti Mg Groups
+
+```{r, echo=FALSE}
+dt1 <- 
+  tibble(
+    "  " = c("Pro Mg", "Anti Mg"),
+    "Number of Observations" = c(3670, 1517),
+    "Mean Mg, mg/dL" = c(0.943, 0.939),
+    "Admins = 0" = c(1840, 935),
+    "Admins = 1" = c(1830, 582)
+  )
+
+dt2 <- 
+  tibble(
+    "  " = c("Pro Mg", "Anti Mg"),
+    "Number of Observations" = c(3393, 1794),
+    "Mean Mg, mg/dL" = c(0.942, 0.940),
+    "Admins = 0" = c(1689, 708),
+    "Admins = 1" = c(1704, 1086)
+  )
+
+dt1 %>% 
+  kable(align = "c", caption = "Divided by Median Nurse Intercept") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+
+
+dt2 %>% 
+  kable(align = "c", caption = "Divided by Mean Nurse Intercept") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+
+```
+
+
+## Table 6 ~ Results of Multivariate Instrumental Variable Regression
+
+AF Event ~ Mg Administration + Serum Mg + Age + Heart Rate + APACHE Score + Previous AF | Mg Group + Serum Mg + Age + Heart Rate + APACHE Score + Previous AF
+
+**Model Information**
+
+*Observations:* 5187
+
+*Dependent Variable:* AF Event
+
+*Type:* Two-Stage Ordinary Least Squares Regression
+
+
+**Residuals:**
+
+```{r, echo=FALSE}
+dt <- 
+  tibble(
+    "Min" = -0.11324,
+    "1Q" = -0.04209,
+    "Median" = -0.01704,
+    "3Q" = 0.02143,
+    "Max" = 1.05952
+  )
+
+dt %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+**Coefficients:**
+
+```{r, echo = FALSE}
+dt <- 
+  tibble(
+    "  " = c("Intercept", "Mg Admin", "Serum Mg", "Binary Age", "Tachycardia", "APACHE", "Prev. AF"),
+    "Estimate" = c(1.188523,
+                   -0.078417,
+                   -0.077322,
+                   0.011626,
+                   0.007189,
+                   0.003168,
+                   0.037830),
+    "Standard Error" = c(0.087823,
+                         0.031764,
+                         0.045264,
+                         0.003563,
+                         0.005062,
+                         0.004181,
+                         0.005144),
+    "t Value" = c(13.533,
+                  -2.469,
+                  -1.708,
+                  3.263,
+                  1.420,
+                  0.758,
+                  7.354),
+    "p Value" = c("< 0.001",
+                  "0.01",
+                  "0.08",
+                  "0.001",
+                  "0.156",
+                  "0.449",
+                  "< 0.001")
+    )
+
+dt %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+
+```
+
+Residual standard error: 0.1232 on 5180 degrees of freedom
+
+Multiple R-Squared: -0.06386, Adjusted R-Squared: -0.06509
+
+Wald test: 15.57 on 6 and 5180 DF, p-value: < 0.001
+
+
+
+## Table 7 ~ Results of Multivariate Logistic Regression
+
+AF Event ~ Mg Administration + Serum Mg + Age + Heart Rate + APACHE Score + Previous AF + Mg Group
+
+**Model Information**
+
+*Observations:* 5187
+
+*Dependent Variable:* AF Event
+
+*Type:* Generalized linear model
+  *Family:* Binomial
+  *Link:* Logit
+
+*Model Fit:*
+Chi Squared (6) = 76.55, p = 0.00
+Pseudo-R Squared = 0.10
+AIC = 721.83, BIC = 767.71
+
+**Residuals:**
+
+```{r, echo=FALSE}
+dt <- 
+  tibble(
+    "Min" = -0.7354,
+    "1Q" = -0.1722,
+    "Median" = -0.1281,
+    "3Q" = -0.0906,
+    "Max" = 3.3790
+  )
+
+dt %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+**Coefficients:**
+
+```{r, echo = FALSE}
+dt <- 
+  tibble(
+    "  " = c("Intercept", "Mg Admin", "Serum Mg", "Binary Age", "Tachycardia", "APACHE", "Prev. AF", "Mg Group"),
+    "Estimate" = c(-7.57820,
+                   0.45554,
+                   2.46506,
+                   0.98351,
+                   0.15023,
+                   0.09326,
+                   1.48089,
+                   -0.64175),
+    "Standard Error" = c(0.75183,
+                         0.30639,
+                         0.59069,
+                         0.30147,
+                         0.32861,
+                         0.26286,
+                         0.24229,
+                         0.24166),
+    "t Value" = c(-10.080,
+                  1.487,
+                  4.173,
+                  3.262,
+                  0.457,
+                  0.355,
+                  6.112,
+                  -2.656),
+    "p Value" = c("< 0.001",
+                  "0.137",
+                  "<0.001",
+                  "0.001",
+                  "0.647",
+                  "0.723",
+                  "< 0.001",
+                  "0.007")
+    )
+
+dt %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+
+```
+
+Null deviance 784.37 on 5186 degrees of freedom
+Residual deviance 701.09 on 5179 degrees of freedom
+AIC 717.09
+
+Number of fisher scoring iterations: 8
+
+
+## Figure 1 ~ Mg Window Structure
+
+```{r, echo=FALSE}
+
+window <- 
+  tibble(
+    "Patient ID" = c(1, 1, 2),
+      
+    "Episode ID" = c("A", "A", "A"),
+    
+    "Mg Lab Datetime" = c("1.1.19 0800", "2.1.19 0600", "14.12.19 0753"),
+    
+    "Serum Mg Level" = c(1.2, 0.8, 0.79),
+    
+    "Mg Lab Next" = c("2.1.19 0600", NA, "14.12.19 0000"),
+    
+    "Mg Lab Plus 24 hours" = c("2.1.19 0800", "3.1.19 0600", "15.12.19 0853"),
+      
+    "Episode End" = c("14.1.19 2358", "14.1.19 2358", "15.12.19 1745"),
+      
+    "Censor Datetime" = c("2.1.19 0600", "3.1.19 0600", "14.12.19 2000")
+    
+  )
+
+window %>% 
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+
+
+```
+
+## Figure 2 ~ Flow Diagram of Study Population
+
+
+
+
+```{r, echo=FALSE}
+knitr::include_graphics("../Graphs/consort.png")
+```
+
+
+## Figure 3 ~ Predicted Probability of Mg Administration by Nurse
+
+
+```{r, echo=FALSE}
+knitr::include_graphics("../Graphs/pred_prob_170220.png")
+```
+
+
+## Figure 4 ~ Distribution of Nurse Coefficients from Multilevel Model
+
+```{r, echo=FALSE}
+knitr::include_graphics("../Graphs/nurse_coefficient_distribution.png")
+```
+
+
+## Figure 5 ~ Distribution of Serum Mg Values for Pr(Mg_Admin) ~ 0.5 for all Nurses
+
+```{r, echo=FALSE}
+knitr::include_graphics("../Graphs/p50_dist.png")
+```
+
+
+
+# References
+
