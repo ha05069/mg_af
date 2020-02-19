@@ -11,7 +11,7 @@ bibliography: bibliography.bib
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("C:/Users/mwils/Documents/Work_Academic/PhD/2019-20/Mg_AF/Manuscripts")
+# setwd("C:/Users/mwils/Documents/Work_Academic/PhD/2019-20/Mg_AF/Manuscripts")
 
 require(knitr)
 library(tidyverse)
@@ -711,6 +711,85 @@ Residual deviance 701.09 on 5179 degrees of freedom
 AIC 717.09
 
 Number of fisher scoring iterations: 8
+
+## Table 8 ~ Results of IV probit regression for extreme dataset.
+
+AF Event ~ Mg Administration (instrumented by nurse group) + Serum Mg + Age + Heart Rate + APACHE Score + Previous AF
+
+**Model Information**
+
+*Observations:* 9064
+
+*Dependent Variable:* AF Event
+
+*Type:* Probit Instrumental variable analysis using Maximum likelikhood estimation.
+
+**Coefficients:**
+
+```{r, echo = FALSE}
+dt <- 
+  tibble(
+    "  " = c("Intercept", "Mg Admin", "Serum Mg", "Binary Age", "Tachycardia", "APACHE", "Prev. AF"),
+    "Estimate" = c(-2.0,
+                   -0.72,
+                   -0.28,
+                   0.42,
+                   0.12,
+                   0.13,
+                   0.74),
+    "p Value" = c("0.003",
+                  "0.023",
+                  "0.527",
+                  "0.000",
+                  "0.203",
+                  "0.084",
+                  "0.000")
+    )
+
+dt %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+```
+
+
+## Table 9 ~ Results of IV probit regression for extreme dataset.
+
+AF Event ~ Mg Administration (instrumented by nurse group) + Serum Mg + Age + Heart Rate + APACHE Score + Previous AF
+
+**Model Information**
+
+*Observations:* 5187
+
+*Dependent Variable:* AF Event
+
+*Type:* Probit Instrumental variable analysis using Maximum likelikhood estimation.
+
+**Coefficients:**
+
+```{r, echo = FALSE}
+dt <- 
+  tibble(
+    "  " = c("Intercept", "Mg Admin", "Serum Mg", "Binary Age", "Tachycardia", "APACHE", "Prev. AF"),
+    "Estimate" = c(0.23,
+                   -1.55,
+                   -1.61,
+                   0.31,
+                   0.16,
+                   0.07,
+                   0.53),
+    "p Value" = c("0.84",
+                  "0.000",
+                  "0.011",
+                  "0.002",
+                  "0.106",
+                  "0.422",
+                  "0.000")
+    )
+
+dt %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+```
 
 
 ## Figure 1 ~ Mg Window Structure
