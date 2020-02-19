@@ -21,10 +21,6 @@ library(kableExtra)
 
 This report represents the current status of this project as of `r Sys.Date()`.
 
-# Issues:
-
-- Implementing IV Probit for binary outcome
-  - "Error in chol.default(mat) : the leading minor of order 3 is not positive definite"
 
 
 # Introduction
@@ -776,6 +772,181 @@ knitr::include_graphics("../Graphs/p50_dist.png")
 ```
 
 
+# Additional Tables:
+
+## Table X ~ Characteristics of Pro and Anti Mg Groups for 9064 observations
+
+Split by median intercept (8.107401).
+
+```{r, echo=FALSE}
+dt1 <- 
+  tibble(
+    Variable = c("Age (Years), Median (IQR)",
+                 "Sex (%)",
+                 "Length of Stay (Days), Median (IQR)",
+                 "APACHE Score, Median (IQR)",
+                 "Unit Mortality (%)",
+                 "Mean (sd) Serum Potassium (mmol/L)",
+                 "Mean (sd) Serum Magnesium (mmol/L)",
+                 "Number of Magnesium Administrations (%)",
+                 "Number of AF Events (%)"),
+    
+    "Pro (n = 5400)" = c("63 (20)",
+                         "Female: 42%",
+                         "13.8 (33.9)",
+                         "20 (9)",
+                         "Dead: 17.0%",
+                         "4.58 (0.496)",
+                         "0.945 (0.206)",
+                         "2542 (47%)",
+                         "76 (1.4%)"
+                         ),
+    
+    "Anti (n = 3664)" = c("63 (22)",
+                          "Female: 43%",
+                          "12.0 (27.0)",
+                          "20 (9)",
+                          "Dead: 16.5%",
+                          "4.57 (0.509)",
+                          "0.948 (0.208)",
+                          "1017 (28%)",
+                          "70 (1.9%)")
+    
+  )
+
+
+dt1 %>% 
+  kable(align = "c", caption = "Divided by Median Nurse Intercept") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+
+
+```
+
+## Table Y ~ Results of Multivariate Instrumental Variable Regression, 9064 observations
+
+AF Event ~ Mg Administration + Serum Mg + Age + Heart Rate + APACHE Score + Previous AF | Mg Group + Serum Mg + Age + Heart Rate + APACHE Score + Previous AF
+
+**Model Information**
+
+*Observations:* 9064
+
+*Dependent Variable:* AF Event
+
+*Type:* Two-Stage Ordinary Least Squares Regression
+
+
+**Residuals:**
+
+```{r, echo=FALSE}
+dt <- 
+  tibble(
+    "Min" = -0.086785,
+    "1Q" = -0.026421,
+    "Median" = -0.014311,
+    "3Q" = 0.004418,
+    "Max" = 1.019474
+  )
+
+dt %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T)
+```
+
+**Coefficients:**
+
+```{r, echo = FALSE}
+dt <- 
+  tibble(
+    "  " = c("Intercept", "Mg Admin", "Serum Mg", "Binary Age", "Tachycardia", "APACHE", "Prev. AF"),
+    "Estimate" = c(0.023608,
+                   -0.031648,
+                   -0.011549,
+                   0.013092,
+                   0.004099,
+                   0.005488,
+                   0.049507),
+    "Standard Error" = c(0.022799,
+                         0.014199,
+                         0.018835,
+                         0.002723,
+                         0.003631,
+                         0.003196,
+                         0.003883),
+    "t Value" = c(1.035,
+                  -2.229,
+                  -0.613,
+                  4.808,
+                  1.129,
+                  1.717,
+                  12.749),
+    "p Value" = c("0.30",
+                  "0.03",
+                  "0.53",
+                  "<0.001",
+                  "0.26",
+                  "0.09",
+                  "< 0.001")
+    )
+
+dt %>% 
+  kable(align = "c") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+
+```
+
+Residual standard error: 0.1252 on 9057 degrees of freedom
+
+Multiple R-Squared: 0.01181, Adjusted R-Squared: 0.01116
+
+Wald test: 40.79 on 6 and 9057 DF, p-value: < 0.001
+
+
+## Table Z ~ Characteristics of Pro and Anti Mg Groups for Tertile dataset (n = 5187)
+
+
+```{r, echo=FALSE}
+dt1 <- 
+  tibble(
+    Variable = c("Age (Years), Median (IQR)",
+                 "Sex (%)",
+                 "Length of Stay (Days), Median (IQR)",
+                 "APACHE Score, Median (IQR)",
+                 "Unit Mortality (%)",
+                 "Mean (sd) Serum Potassium (mmol/L)",
+                 "Mean (sd) Serum Magnesium (mmol/L)",
+                 "Number of Magnesium Administrations (%)",
+                 "Number of AF Events (%)"),
+    
+    "Pro (n = 3670)" = c("63 (20)",
+                         "Female: 42%",
+                         "13.9 (32.2)",
+                         "20 (9)",
+                         "Dead: 17.7%",
+                         "4.58 (0.492)",
+                         "0.943 (0.200)",
+                         "1830 (49.9%)",
+                         "44 (1.2%)"
+                         ),
+    
+    "Anti (n = 1517)" = c("64 (21)",
+                          "Female: 41%",
+                          "12.0 (32.6)",
+                          "20 (9)",
+                          "Dead: 14.2%",
+                          "4.56 (0.492)",
+                          "0.939 (0.213)",
+                          "582 (38.3%)",
+                          "31 (2.0%)")
+    
+  )
+
+
+dt1 %>% 
+  kable(align = "c", caption = "Divided by Median Nurse Intercept") %>% 
+  kable_styling(bootstrap_options = "striped", full_width = T) 
+
+
+```
 
 # References
 
